@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.gson.Gson;
@@ -19,10 +20,8 @@ import com.google.cloud.bigtable.data.v2.models.TargetId;
 public class BigtableAdapter{
 
     private static final Logger logger = Logger.getLogger(BigtableAdapter.class.getName());
-    private static final String DEFAULT_CREDENTIAL_PATH = "src/main/java/cred/gcs_bucket.json";
-    private static final String bigtableCred = System.getenv("BIGTABLE_CREDENTIALS") != null
-            ? System.getenv("BIGTABLE_CREDENTIALS")
-            : DEFAULT_CREDENTIAL_PATH;
+    private static final String DEFAULT_CREDENTIAL_PATH = "/app/cred/gcs_bucket.json";
+    private static final String bigtableCred = DEFAULT_CREDENTIAL_PATH;
     private static final String projectId = "marketcheck-gcp";
     private static final String instanceId = "marketcheck-cars-cbt";
     private static final String tableId = "mc-delta-neovin";
@@ -34,6 +33,7 @@ public class BigtableAdapter{
     // Initialize Client Once
     static{
         try{
+            logger.setLevel(Level.ALL);
             GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(bigtableCred));
             logger.info("Google credentials " + credentials);
             // Create a CredentialsProvider
@@ -65,6 +65,7 @@ public class BigtableAdapter{
 
     public static String getTaxonomyData(String vin){
         Map<String, String> vinDataMap = new HashMap<>();
+        logger.setLevel(Level.ALL);
         try{
             long startTime = System.currentTimeMillis();
             Row row = dataClient.readRow(targetId, vin); // Corrected method usage
