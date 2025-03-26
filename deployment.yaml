@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bigtable-deployment
+  namespace: test-ws
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: bigtable-deployment
+  template:
+    metadata:
+      labels:
+        app: bigtable-deployment
+    spec:
+      containers:
+        - name: bigtable-deployment
+          image: us-central1-docker.pkg.dev/marketcheck-gcp/parser/bigtable-deployment:latest
+          command: [ "java" ]
+          args: [ "-Xmx50m", "-jar", "/app/app.jar" ]
+          env:
+            - name: BIGTABLE_CREDENTIALS
+              value: "/app/cred/gcs_bucket.json"  # Path to credentials
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "200m"
+          imagePullPolicy: Always
+      tolerations:
+        - key: type
+          operator: Equal
+          value: full-parser
+          effect: NoSchedule
+      nodeSelector:
+        nodeType: full-parser
