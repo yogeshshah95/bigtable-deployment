@@ -28,6 +28,14 @@ spec:
               memory: "500Mi"
               cpu: "200m"
           imagePullPolicy: Always
+          volumeMounts:
+            - name: bigtable-credentials-volume
+              mountPath: "/app/cred"
+              readOnly: true
+      volumes:
+        - name: bigtable-credentials-volume
+          secret:
+            secretName: bigtable-credentials  # Use your created secret
       tolerations:
         - key: type
           operator: Equal
